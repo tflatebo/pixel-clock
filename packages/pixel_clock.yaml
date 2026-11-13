@@ -99,10 +99,6 @@ binary_sensor:
       number: $right_button_pin
       inverted: true
       mode: INPUT_PULLUP
-    on_release:
-      then:
-        - lambda: |-
-            id(rgb8x32)->skip_screen();
 
 sensor:
   - platform: sht3xd
