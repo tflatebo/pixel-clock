@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pixel Clock TC001 Flasher</title>
+    <script
+      type="module"
+      src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"
+    ></script>
+  </head>
+  <body>
+    <h1>Install Pixel Clock on Ulanzi TC001</h1>
+    <p>
+      Connect the TC001 to this computer with a USB data cable, then select
+      its serial port in the installer.
+    </p>
+    <esp-web-install-button
+      manifest="https://andrewjswan.github.io/pixel-clock/pixel-clock/pixel-clock-en-manifest.json"
+    ></esp-web-install-button>
+    <p>
+      This installs the published English Pixel Clock firmware release; it
+      does not build firmware from this clone.
+    </p>
+  </body>
+</html>

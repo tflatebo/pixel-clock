@@ -18,7 +18,7 @@ ESPHome firmware for Ulanzi TC001 Clock using [EspHoMaTriX](https://github.com/l
 [Pixel Clock](https://andrewjswan.github.io/pixel-clock/)
 
 ## Firmware
-You can install the firmware using [ESPHome](https://esphome.io/) using one of the ready-made configuration files or use [**PixelClock - ESP Web Tools**](https://andrewjswan.github.io/pixel-clock/firmware.html) - a convenient tool for installing and updating the firmware of ESP32 devices in the browser.
+You can install the firmware using [ESPHome](https://esphome.io/) using one of the ready-made configuration files or use [**PixelClock - ESP Web Tools**](https://andrewjswan.github.io/pixel-clock/firmware/) - a convenient tool for installing and updating the firmware of ESP32 devices in the browser.
 
 ## 🤝 Support
 If you like the project, you can support it with a star ⭐ on GitHub.

@@ -9,11 +9,9 @@
     document.querySelectorAll("input.device").forEach((radio) => {
         radio.addEventListener("change", () => {
             const button = document.querySelector('esp-web-install-button');
-            let device = radio.value;
-            let family = radio.id;
-            device = device ? `devices/${device}-` : "";
-            family = family ? `${family}-` : "";
-            button.manifest = `../${device}${family}manifest.json`;
+                const device = radio.value;
+                const family = radio.id;
+                button.manifest = `../pixel-clock/${device}${family ? `-${family}` : ""}-manifest.json`;
         });
     });
 });
