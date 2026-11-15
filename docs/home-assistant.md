@@ -107,96 +107,52 @@ Sample automation for the trashcan type
 
     See [Add timezone support to GetTimeResponse for automatic timezone synchronization](https://github.com/esphome/esphome/pull/10661)
 
-### Ulanzi TC001: two Home Assistant display pages
+### Ulanzi TC001: Home Assistant display pages
 
-The TC001's 32×8 matrix is best used with short, scrolling text. The following
-example uses the stable alias sensors `sensor.display_outdoor_temperature`,
-`sensor.display_indoor_temperature`, and `sensor.display_feels_like_temperature`.
-Point those aliases at the desired source entities in Home Assistant; the
-display automations do not need to change when the sources change.
+The TC001's 32×8 matrix works best with short, colored, scrolling text. A Home
+Assistant [package](https://www.home-assistant.io/docs/configuration/packages/) can
+drive it with four pages, stepped with the left and right buttons:
 
-Add a page selector to `configuration.yaml`:
+| Page | Shows |
+|---|---|
+| Time + outdoor | `HH:MM` and the feels-like temperature, refreshed every minute |
+| Temperature details | Indoor, outdoor, and feels-like, alternating with an `I/O/FL` label |
+| Today forecast | Scrolling: `TODAY Sunny 46/37 0.00in` |
+| Next 3 days | Scrolling: `MON Sunny 54/36 0.00in   TUE Partly cloudy 56/44 0.25in   WED …` |
 
-```yaml
-input_select:
-  tc001_display_page:
-    name: TC001 display page
-    options:
-      - "Time + outdoor"
-      - "Temperature details"
-    initial: "Time + outdoor"
-```
+Pages other than the time page return to it after 30 seconds (60 seconds for Next 3
+days, whose text takes about 38 seconds to scroll through once). The middle button keeps
+the firmware's own clock/date action.
 
-Add these automations to `automations.yaml`. Replace the button entity IDs and
-ESPHome service name with the IDs shown in your Home Assistant instance.
-Left selects the time and outdoor temperature page; Right selects the three
-temperature page. Middle retains the firmware's existing clock/date action.
+The reference implementation is two files in the `homeassistant-config` repository.
+Deleting them (and restarting Home Assistant) removes the integration:
 
-```yaml
-- alias: TC001 select display page with buttons
-  trigger:
-    - platform: state
-      entity_id: binary_sensor.pixel_clock_left_button
-      to: "on"
-      id: page1
-    - platform: state
-      entity_id: binary_sensor.pixel_clock_right_button
-      to: "on"
-      id: page2
-  action:
-    - service: input_select.select_option
-      target:
-        entity_id: input_select.tc001_display_page
-      data:
-        option: "{{ 'Time + outdoor' if trigger.id == 'page1' else 'Temperature details' }}"
-  mode: restart
+- `packages/tc001.yaml`: the `input_select.tc001_display_page` page selector,
+  `script.tc001_show_text` (the only call to the device),
+  `script.tc001_render_page`, and the button, render, and return-home automations
+- `custom_templates/tc001.jinja`: the text for each page
 
-- alias: TC001 render selected display page
-  trigger:
-    - platform: homeassistant
-      event: start
-    - platform: time_pattern
-      minutes: "/1"
-    - platform: state
-      entity_id:
-        - input_select.tc001_display_page
-        - sensor.display_outdoor_temperature
-        - sensor.display_indoor_temperature
-        - sensor.display_feels_like_temperature
-  action:
-    - choose:
-        - conditions:
-            - condition: state
-              entity_id: input_select.tc001_display_page
-              state: "Time + outdoor"
-          sequence:
-            - service: esphome.pixel_clock_alert_text_screen
-              data:
-                text: >-
-                  {% set outdoor = states('sensor.display_outdoor_temperature') %}
-                  {{ now().strftime('%H:%M') }}
-                  {{ outdoor | float | round(0) if is_number(outdoor) else '--' }}°F
-                screen_time: 90
-                default_font: true
-        - conditions:
-            - condition: state
-              entity_id: input_select.tc001_display_page
-              state: "Temperature details"
-          sequence:
-            - service: esphome.pixel_clock_alert_text_screen
-              data:
-                text: >-
-                  {% set indoor = states('sensor.display_indoor_temperature') %}
-                  {% set outdoor = states('sensor.display_outdoor_temperature') %}
-                  {% set feels = states('sensor.display_feels_like_temperature') %}
-                  IN {{ indoor | float | round(0) if is_number(indoor) else '--' }}°F
-                  OUT {{ outdoor | float | round(0) if is_number(outdoor) else '--' }}°F
-                  FEELS {{ feels | float | round(0) if is_number(feels) else '--' }}°F
-                screen_time: 90
-                default_font: true
-  mode: restart
-```
+It reads shared entities from `packages/displays.yaml` in the same repository:
+`sensor.display_outdoor_temperature`, `sensor.display_indoor_temperature`,
+`sensor.display_feels_like_temperature`, and `sensor.display_daily_forecast`. Point
+the `input_text.display_*_source` helpers at the real sensors; the TC001 pages don't
+change when the sources change.
 
-The selected page is refreshed every minute so the clock stays current; sensor
-changes rerender the selected page immediately. The longer temperature page
-scrolls across the matrix.
+To adapt it to another clock:
+
+1. Enable packages in `configuration.yaml`:
+
+    ```yaml
+    homeassistant:
+      packages: !include_dir_named packages
+    ```
+
+2. In `packages/tc001.yaml`, set the action name in `script.tc001_show_text` (e.g.
+   `esphome.pixel_clock_en_alert_text_screen`) and the button entities in the button
+   automation to the IDs shown in your Home Assistant instance.
+3. Keep `multicolor_text: true` in the firmware (the default in
+   `packages/pixel_clock.yaml`). The page text uses `#RRGGBB` markers to color each
+   temperature on the shared blue → green → red scale from
+   `custom_templates/displays.jinja`.
+4. Don't also create a UI helper named `tc001_display_page`; it would clash with the
+   one the package defines.
