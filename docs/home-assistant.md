@@ -111,12 +111,11 @@ Sample automation for the trashcan type
 
 The TC001's 32×8 matrix works best with short, colored, scrolling text. A Home
 Assistant [package](https://www.home-assistant.io/docs/configuration/packages/) can
-drive it with four pages, stepped with the left and right buttons:
+drive it with three pages, stepped with the left and right buttons:
 
 | Page | Shows |
 |---|---|
 | Time + outdoor | `HH:MM` and the feels-like temperature, refreshed every minute |
-| Temperature details | Indoor, outdoor, and feels-like, alternating with an `I/O/FL` label |
 | Today forecast | Scrolling: `TODAY Sunny 46/37 0.00in` |
 | Next 3 days | Scrolling: `MON Sunny 54/36 0.00in   TUE Partly cloudy 56/44 0.25in   WED …` |
 
@@ -133,8 +132,7 @@ Deleting them (and restarting Home Assistant) removes the integration:
 - `custom_templates/tc001.jinja`: the text for each page
 
 It reads shared entities from `packages/displays.yaml` in the same repository:
-`sensor.display_outdoor_temperature`, `sensor.display_indoor_temperature`,
-`sensor.display_feels_like_temperature`, and `sensor.display_daily_forecast`. Point
+`sensor.display_feels_like_temperature` and `sensor.display_daily_forecast`. Point
 the `input_text.display_*_source` helpers at the real sensors; the TC001 pages don't
 change when the sources change.
 
