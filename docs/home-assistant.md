@@ -120,8 +120,8 @@ drive it with four pages, stepped with the left and right buttons:
 | Today forecast | Scrolling: `TODAY Sunny 46/37 0.00in` |
 | Next 3 days | Scrolling: `MON Sunny 54/36 0.00in   TUE Partly cloudy 56/44 0.25in   WED …` |
 
-Pages other than the time page return to it after 30 seconds (60 seconds for Next 3
-days, whose text takes about 38 seconds to scroll through once). The middle button keeps
+Pages other than the time page return to it after 60 seconds, long enough for the
+Next 3 days text (about 38 seconds) to scroll through once. The middle button keeps
 the firmware's own clock/date action.
 
 The reference implementation is two files in the `homeassistant-config` repository.
