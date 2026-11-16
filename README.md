@@ -22,3 +22,10 @@ You can install the firmware using [ESPHome](https://esphome.io/) using one of t
 
 ## 🤝 Support
 If you like the project, you can support it with a star ⭐ on GitHub.
+
+## About this fork
+This fork tracks [andrewjswan/pixel-clock](https://github.com/andrewjswan/pixel-clock)
+and adds documentation for driving the TC001 from Home Assistant: see
+[docs/home-assistant.md](docs/home-assistant.md) → "Ulanzi TC001: Home Assistant
+display pages". The ready-made configuration files (`pixel_clock*.yaml`) still pull
+their packages from upstream.
